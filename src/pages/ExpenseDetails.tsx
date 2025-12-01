@@ -223,7 +223,7 @@ export function ExpenseDetails() {
       {/* AI Insight Banner */}
       <AIInsightBanner
         unclassifiedCount={unclassifiedCount}
-        onAutoClassify={() => {}}
+        onAutoClassify={() => { }}
       />
 
       {/* Summary Cards */}

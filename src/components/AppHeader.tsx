@@ -25,9 +25,9 @@ export function AppHeader() {
       <div className="flex items-center justify-between h-16 px-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white">S</span>
+            <span className="text-white">D</span>
           </div>
-          <span>Smart Finances</span>
+          <span>FinD</span>
         </div>
 
         <div className="flex items-center gap-4">
