@@ -5,6 +5,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Switch } from '../components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { AIClassifierDemo } from '../components/expense/AIClassifierDemo';
 
 export function Settings() {
   const { user } = useAuth();
@@ -57,6 +58,9 @@ export function Settings() {
           <TabsTrigger value="notifications" className="rounded-none border-b-2 data-[state=active]:border-blue-600">
             Cảnh báo
           </TabsTrigger>
+          <TabsTrigger value="ai-demo" className="rounded-none border-b-2 data-[state=active]:border-blue-600">
+            🤖 AI Demo
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="p-6">
@@ -91,7 +95,7 @@ export function Settings() {
               />
             </div>
 
-            <Button type="submit">Lưu thay đổi</Button>
+            <Button type="submit" className='bg-blue-600 hover:bg-blue-700'>Lưu thay đổi</Button>
           </form>
         </TabsContent>
 
@@ -130,7 +134,7 @@ export function Settings() {
               />
             </div>
 
-            <Button type="submit">Đổi mật khẩu</Button>
+            <Button type="submit" className='bg-blue-600 hover:bg-blue-700'>Đổi mật khẩu</Button>
           </form>
         </TabsContent>
 
@@ -192,6 +196,10 @@ export function Settings() {
               Lưu cài đặt
             </Button>
           </div>
+        </TabsContent>
+
+        <TabsContent value="ai-demo" className="p-6">
+          <AIClassifierDemo />
         </TabsContent>
       </Tabs>
     </div>

@@ -86,7 +86,7 @@ export function Register() {
             />
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="bg-blue-600 hover:bg-blue-700 w-full">
             Đăng ký
           </Button>
         </form>

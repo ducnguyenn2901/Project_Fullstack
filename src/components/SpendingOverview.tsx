@@ -16,32 +16,34 @@ export function SpendingOverview() {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h2 className="mb-6">Spending overview</h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-          <XAxis 
-            dataKey="month" 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#6b7280' }}
-          />
-          <YAxis 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#6b7280' }}
-            ticks={[0, 5000, 10000, 20000]}
-          />
-          <Bar 
-            dataKey="amount" 
-            radius={[8, 8, 0, 0]}
-            fill="#10b981"
-          >
-            {data.map((entry, index) => (
-              <Bar key={`bar-${index}`} fill={colors[index]} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="w-full" style={{ height: '300px', minHeight: '300px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+            <XAxis 
+              dataKey="month" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#6b7280' }}
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#6b7280' }}
+              ticks={[0, 5000, 10000, 20000]}
+            />
+            <Bar 
+              dataKey="amount" 
+              radius={[8, 8, 0, 0]}
+              fill="#10b981"
+            >
+              {data.map((entry, index) => (
+                <Bar key={`bar-${index}`} fill={colors[index]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -48,7 +48,7 @@ export function Goals() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h1>Mục tiêu tài chính</h1>
-        <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+        <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700 gap-2">
           <Plus className="w-4 h-4" />
           Tạo mục tiêu mới
         </Button>

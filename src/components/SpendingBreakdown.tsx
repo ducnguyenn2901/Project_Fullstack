@@ -14,7 +14,7 @@ export function SpendingBreakdown() {
       <h2 className="mb-6">Your spending</h2>
       
       <div className="flex flex-col md:flex-row items-center gap-8">
-        <div className="w-48 h-48">
+        <div className="w-48 h-48" style={{ minWidth: '192px', minHeight: '192px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

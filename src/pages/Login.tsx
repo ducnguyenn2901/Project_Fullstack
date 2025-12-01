@@ -5,7 +5,6 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 
-
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +54,7 @@ export function Login() {
             />
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="bg-blue-600 hover:bg-blue-700 w-full">
             Đăng nhập
           </Button>
         </form>

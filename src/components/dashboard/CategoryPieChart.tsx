@@ -12,7 +12,7 @@ export function CategoryPieChart() {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h2 className="mb-6">Tỷ lệ chi tiêu theo danh mục</h2>
-      <div className="w-full h-[300px]">
+      <div className="w-full" style={{ height: '300px', minHeight: '300px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

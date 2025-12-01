@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from '../ui/button';
 import {
@@ -7,82 +7,71 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from '../ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { classifyTransaction, getSuggestions } from '../../utils/aiCategoryClassifier.ts';
+import { Badge } from '../ui/badge';
 
-const mockTransactions = [
-  {
-    id: 1,
-    date: '2024-11-24',
-    description: 'Mua đồ ăn tại siêu thị',
-    category: 'Ăn uống',
-    amount: -350000,
-  },
-  {
-    id: 2,
-    date: '2024-11-23',
-    description: 'Lương tháng 11',
-    category: 'Thu nhập',
-    amount: 25000000,
-  },
-  {
-    id: 3,
-    date: '2024-11-22',
-    description: 'Mua sách giáo trình',
-    category: 'Giáo dục',
-    amount: -480000,
-  },
-  {
-    id: 4,
-    date: '2024-11-21',
-    description: 'Xem phim tại rạp',
-    category: 'Giải trí',
-    amount: -180000,
-  },
-  {
-    id: 5,
-    date: '2024-11-20',
-    description: 'Mua quần áo',
-    category: 'Mua sắm',
-    amount: -850000,
-  },
-  {
-    id: 6,
-    date: '2024-11-19',
-    description: 'Ăn tối nhà hàng',
-    category: 'Ăn uống',
-    amount: -680000,
-  },
-  {
-    id: 7,
-    date: '2024-11-18',
-    description: 'Trả góp tháng 11',
-    category: 'Vay nợ',
-    amount: -1500000,
-  },
-  {
-    id: 8,
-    date: '2024-11-17',
-    description: 'Đổ xăng xe',
-    category: 'Khác',
-    amount: -420000,
-  },
-];
+interface Transaction {
+  id: number;
+  date: string;
+  description: string;
+  category: string;
+  amount: number;
+}
 
-export function TransactionTable() {
-  const [transactions, setTransactions] = useState(mockTransactions);
+interface TransactionTableProps {
+  transactions: Transaction[];
+  onUpdateTransaction: (id: number, newCategory: string) => void;
+}
+
+export function TransactionTable({ transactions, onUpdateTransaction }: TransactionTableProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newCategory, setNewCategory] = useState('');
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleOpenDialog = (transaction: any) => {
+    setEditingId(transaction.id);
+    setNewCategory(transaction.category);
+    setSelectedTransaction(transaction);
+    setIsDialogOpen(true);
+    
+    // Lấy gợi ý AI
+    const suggestions = getSuggestions(transaction.description, transaction.amount);
+    setAiSuggestions(suggestions);
+  };
+
+  const handleApplyAISuggestion = () => {
+    if (aiSuggestions.length > 0) {
+      setNewCategory(aiSuggestions[0].category);
+    }
+  };
 
   const handleSaveCategory = (id: number) => {
-    setTransactions(
-      transactions.map((t) =>
-        t.id === id ? { ...t, category: newCategory } : t
-      )
-    );
+    onUpdateTransaction(id, newCategory);
+    setIsDialogOpen(false);
     setEditingId(null);
+    setAiSuggestions([]);
+    setSelectedTransaction(null);
   };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 70) return 'bg-green-100 text-green-800 border-green-200';
+    if (confidence >= 50) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  if (transactions.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        <p>Không có giao dịch nào phù hợp với bộ lọc</p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -119,31 +108,95 @@ export function TransactionTable() {
                 </span>
               </TableCell>
               <TableCell className="text-right">
-                <Dialog>
+                <Dialog open={isDialogOpen && editingId === transaction.id} onOpenChange={(open) => {
+                  if (!open) {
+                    setIsDialogOpen(false);
+                    setEditingId(null);
+                    setAiSuggestions([]);
+                    setSelectedTransaction(null);
+                  }
+                }}>
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setEditingId(transaction.id);
-                        setNewCategory(transaction.category);
-                      }}
+                      onClick={() => handleOpenDialog(transaction)}
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-md">
                     <DialogHeader>
-                      <DialogTitle>Chỉnh sửa danh mục</DialogTitle>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-purple-600" />
+                        Phân loại thông minh với AI
+                      </DialogTitle>
+                      <DialogDescription>
+                        Sử dụng AI để phân loại giao dịch của bạn một cách chính xác và nhanh chóng.
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
-                      <div>
-                        <p className="text-gray-600 mb-2">Giao dịch:</p>
-                        <p>{transaction.description}</p>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <p className="text-gray-600 mb-1">Giao dịch:</p>
+                        <p className="text-gray-900">{transaction.description}</p>
                       </div>
+
+                      {/* AI Suggestions */}
+                      {aiSuggestions.length > 0 && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-gray-700">Gợi ý từ AI:</p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleApplyAISuggestion}
+                              className="gap-2"
+                            >
+                              <Sparkles className="w-3 h-3" />
+                              Áp dụng gợi ý
+                            </Button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {aiSuggestions.map((suggestion, index) => (
+                              <div
+                                key={index}
+                                className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                                  newCategory === suggestion.category
+                                    ? 'border-purple-500 bg-purple-50'
+                                    : 'border-gray-200 hover:border-purple-300'
+                                }`}
+                                onClick={() => setNewCategory(suggestion.category)}
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <span>{suggestion.category}</span>
+                                    {newCategory === suggestion.category && (
+                                      <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                                    )}
+                                  </div>
+                                  <Badge
+                                    variant="outline"
+                                    className={getConfidenceColor(suggestion.confidence)}
+                                  >
+                                    {suggestion.confidence}% tin cậy
+                                  </Badge>
+                                </div>
+                                {index === 0 && (
+                                  <p className="text-gray-500 mt-1">
+                                    ⭐ Được đề xuất
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Manual Selection */}
                       <div>
                         <label className="block text-gray-700 mb-2">
-                          Danh mục mới
+                          Hoặc chọn thủ công:
                         </label>
                         <Select value={newCategory} onValueChange={setNewCategory}>
                           <SelectTrigger>
@@ -154,6 +207,9 @@ export function TransactionTable() {
                             <SelectItem value="Mua sắm">Mua sắm</SelectItem>
                             <SelectItem value="Giáo dục">Giáo dục</SelectItem>
                             <SelectItem value="Giải trí">Giải trí</SelectItem>
+                            <SelectItem value="Di chuyển">Di chuyển</SelectItem>
+                            <SelectItem value="Y tế">Y tế</SelectItem>
+                            <SelectItem value="Hóa đơn">Hóa đơn</SelectItem>
                             <SelectItem value="Vay nợ">Vay nợ</SelectItem>
                             <SelectItem value="Thu nhập">Thu nhập</SelectItem>
                             <SelectItem value="Khác">Khác</SelectItem>

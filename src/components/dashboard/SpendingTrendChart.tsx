@@ -13,7 +13,7 @@ export function SpendingTrendChart() {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h2 className="mb-6">Xu hướng chi tiêu 6 tháng gần đây</h2>
-      <div className="w-full h-[300px]">
+      <div className="w-full" style={{ height: '300px', minHeight: '300px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
